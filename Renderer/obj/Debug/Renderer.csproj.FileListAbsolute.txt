@@ -1,0 +1,12 @@
+C:\Users\stasi\source\repos\Renderer\Renderer\bin\Debug\Renderer.exe.config
+C:\Users\stasi\source\repos\Renderer\Renderer\bin\Debug\Renderer.exe
+C:\Users\stasi\source\repos\Renderer\Renderer\bin\Debug\Renderer.pdb
+C:\Users\stasi\source\repos\Renderer\Renderer\bin\Debug\TargaImage.dll
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.csprojAssemblyReference.cache
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.Form1.resources
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.Properties.Resources.resources
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.csproj.GenerateResource.cache
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.csproj.CoreCompileInputs.cache
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.csproj.CopyComplete
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.exe
+C:\Users\stasi\source\repos\Renderer\Renderer\obj\Debug\Renderer.pdb
