@@ -1,0 +1,130 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+
+namespace Renderer
+{
+    public struct Vertex
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+        public float W { get; set; }
+        public Vertex(float x, float y, float z, float w) : this()
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+            this.W = w;
+        }
+    }
+
+    class Model
+    {
+        string _fileName;
+        string[] lines;
+        System.Drawing.Bitmap diffuseMap, normalMap, specularMap;
+
+        public System.Drawing.Bitmap DiffuseMap { get { return diffuseMap; } }
+
+        private List<Vec3f> verts = new List<Vec3f>();
+        public List<Vec3f> Verts { get { return verts; } }
+
+        List<Vec3i> faces = new List<Vec3i>();
+        public List<Vec3i> Faces { get { return faces; } }
+
+         List<Vec2f> uv = new List<Vec2f>();
+        public List<Vec2f> UV { get { return uv; } }
+
+        List<Vec3i> uvVertice = new List<Vec3i>();
+        public List<Vec3i> UVVertice { get { return uvVertice; } }
+
+
+
+        private void Parse()
+        {
+            
+
+            foreach (string line in lines)
+            {
+                if (line.ToLower().StartsWith("v "))
+                {
+                    var vx = line.Split(' ').Skip(1).Select(v => float.Parse(v.Replace('.', ','))).ToArray();
+                    verts.Add(new Vec3f(vx[0], vx[1], vx[2]));
+                }
+                else if (line.ToLower().StartsWith("f "))
+                {
+                    var fx = line.Split(' ', '/');
+
+                    int f1 = Int32.Parse(fx[1]);
+                    int f2 = Int32.Parse(fx[4]);
+                    int f3 = Int32.Parse(fx[7]);
+                    
+                    int vt1 = Int32.Parse(fx[2]);
+                    int vt2 = Int32.Parse(fx[5]);
+                    int vt3 = Int32.Parse(fx[8]);
+                    
+                    faces.Add(new Vec3i(f1, f2, f3));
+                    uvVertice.Add(new Vec3i(vt1, vt2, vt3));
+                }
+                
+                else if(line.ToLower().StartsWith("vt "))
+                {
+                    var vx = line.Split(' ').Skip(2).Select(vt => float.Parse(vt.Replace('.', ','))).ToArray(); ;
+                    
+                    uv.Add( new Vec2f(vx[0], vx[1]));
+                }
+                
+            }
+
+
+
+
+        }
+
+        public Model(string fileName)
+        {
+            _fileName =  fileName.Replace(".obj", "");
+            lines = File.ReadAllLines(@"Resources\" + _fileName +@"\"+ fileName);
+            
+            loadTexture(_fileName, "_diffuse.tga",ref diffuseMap);
+            loadTexture(_fileName, "_nm_tangent.tga",ref normalMap);
+            loadTexture(_fileName, "_spec.tga",ref specularMap);
+            Parse();
+            
+        }
+
+        private void loadTexture(string fileName,string suffix, ref System.Drawing.Bitmap img)
+        {
+            try
+            {
+                img = Paloma.TargaImage.LoadTargaImage(@"Resources\"+fileName +@"\"+fileName + suffix );
+            }
+            catch
+            {
+                switch (suffix)
+                {
+                    case "_diffuse.tga":
+                        System.Windows.Forms.MessageBox.Show("Не удалось загрузить дифузную карту");
+                        break;
+                    case "_nm_tangent.tga":
+                        System.Windows.Forms.MessageBox.Show("Не удалось загрузить карту нормалей");
+                        break;
+                    case "_spec.tga":
+                        System.Windows.Forms.MessageBox.Show("Не удалось загрузить карту бликов");
+                        break;
+                   
+                }
+                
+            }
+
+
+        }
+    }
+
+ 
+}

@@ -23,6 +23,7 @@ namespace Renderer
         public static Vec2i operator +(Vec2i A, Vec2i B) { return new Vec2i(A.x + B.x, A.y + B.y); }
         public static Vec2i operator -(Vec2i A, Vec2i B) { return new Vec2i(A.x - B.x, A.y - B.y); }
         public static Vec2i operator *(Vec2i A, Vec2i B) { return new Vec2i(A.x * B.x, A.y * B.y); }
+        public static Vec2i operator *(Vec2i A, float B) { return new Vec2i((int)((A.x * B)+0.5), (int)((A.y * B)+0.5)); }
     }
 
     struct Vec2f
@@ -43,16 +44,16 @@ namespace Renderer
             raw = new float[2];
         }
 
-        public static Vec2f operator +(Vec2f A, Vec2f B) { return new Vec2f(A.u + B.u, A.v + B.v); }
-        public static Vec2f operator -(Vec2f A, Vec2f B) { return new Vec2f(A.u - B.u, A.v - B.v); }
-        public static Vec2f operator *(Vec2f A, Vec2f B) { return new Vec2f(A.u * B.u, A.v * B.v); }
+        public static Vec2f operator +(Vec2f A, Vec2f B) { return new Vec2f(A.x + B.x, A.y + B.y); }
+        public static Vec2f operator -(Vec2f A, Vec2f B) { return new Vec2f(A.x - B.x, A.y - B.y); }
+        public static Vec2f operator *(Vec2f A, Vec2f B) { return new Vec2f(A.x * B.x, A.y * B.y); }
     }
 
     struct Vec3i
     {
 
         public int ivert, iuv,inorm;
-       public int x, y,z;
+        public int x, y,z;
         public int[] raw;
 
 
@@ -71,7 +72,7 @@ namespace Renderer
         {
             iuv = 0;
             ivert = 0;
-            inorm =0;
+            inorm = 0;
             x = _x;
             y = _y;
             z = _z;

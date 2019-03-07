@@ -7,33 +7,34 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 
+
 namespace Renderer
 {
     static class Program
     {
+       static public Model model = new Model("african_head.obj");
+       static Bitmap image = new Bitmap(800, 800);
+
+
+       static int mapHidght = image.Height;
+       static int mapWidth = image.Width;
+       static int depth = 256;
+        static Vec3f light_dir = new Vec3f(0, 0, -1);
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
         [STAThread]
         static void Main()
         {
-            Bitmap image = new Bitmap(800, 800);
-            Color white = Color.FromArgb(255, 255, 255, 255);
-            Color red = Color.FromArgb(255, 255, 0, 0);
-            Color green = Color.FromArgb(255, 0, 255, 0);
-            Color blue = Color.FromArgb(255, 0, 0, 255);
-            int mapHidght = image.Height;
-            int mapWidth = image.Width;
-            int depth = 256;
-
+            
             int[] zbuffer = new int[mapHidght * mapWidth];
             foreach (var a in zbuffer)
             {
                 zbuffer[a] = int.MinValue;
             }
 
-            ObjParser model = new ObjParser();
-            Vec3f light_dir = new Vec3f(0, 0, -1);
+            
+            
             
             DrawModel(model);
             
@@ -51,28 +52,36 @@ namespace Renderer
 
 
                 }
-            
-            
 
 
-            void DrawModel(ObjParser objParser)
+
+            
+            void DrawModel(Model objParser)
             {
-                Bitmap texture = Paloma.TargaImage.LoadTargaImage(@"Resources\african_head_diffuse.tga");
+                
 
-                for (int i = 0; i < objParser.Polygons.Count; i++)
+                for (int i = 0; i < objParser.Faces.Count; i++)
                 {
-                    int poly1 = objParser.Polygons[i].Item1;
-                    int poly2 = objParser.Polygons[i].Item2;
-                    int poly3 = objParser.Polygons[i].Item3;
 
-                    Vec3f a = new Vec3f((objParser.Vertices[poly1 - 1].X), (objParser.Vertices[poly1 - 1].Y), objParser.Vertices[poly1 - 1].Z);
-                    Vec3i aa = new Vec3i((int)((objParser.Vertices[poly1 - 1].X + 1) * mapWidth / 2), (int)((objParser.Vertices[poly1 - 1].Y + 1) * mapHidght / 2), (int)((objParser.Vertices[poly1 - 1].Z + 1) * depth / 2));
+                    Vec3i poly = objParser.Faces[i];
 
-                    Vec3f b = new Vec3f((objParser.Vertices[poly2 - 1].X), (objParser.Vertices[poly2 - 1].Y), objParser.Vertices[poly2 - 1].Z);
-                    Vec3i bb = new Vec3i((int)((objParser.Vertices[poly2 - 1].X + 1) * mapWidth / 2), (int)((objParser.Vertices[poly2 - 1].Y + 1) * mapHidght / 2), (int)((objParser.Vertices[poly2 - 1].Z + 1) * depth / 2));
 
-                    Vec3f c = new Vec3f((objParser.Vertices[poly3 - 1].X), (objParser.Vertices[poly3 - 1].Y), objParser.Vertices[poly3 - 1].Z);
-                    Vec3i cc = new Vec3i((int)((objParser.Vertices[poly3 - 1].X + 1) * mapWidth / 2), (int)((objParser.Vertices[poly3 - 1].Y + 1) * mapHidght / 2), (int)((objParser.Vertices[poly3 - 1].Z + 1) * depth / 2));
+                    Vec3f a = new Vec3f((objParser.Verts[poly.x - 1].x), (objParser.Verts[poly.x - 1].y), objParser.Verts[poly.x - 1].z);
+                    Vec3i aa = new Vec3i((int)((objParser.Verts[poly.x - 1].x + 1) * mapWidth / 2), (int)((objParser.Verts[poly.x - 1].y + 1) * mapHidght / 2), (int)((objParser.Verts[poly.x - 1].z + 1) * depth / 2));
+
+                    Vec3f b = new Vec3f((objParser.Verts[poly.y - 1].x), (objParser.Verts[poly.y - 1].y), objParser.Verts[poly.y - 1].z);
+                    Vec3i bb = new Vec3i((int)((objParser.Verts[poly.y - 1].x + 1) * mapWidth / 2), (int)((objParser.Verts[poly.y - 1].y + 1) * mapHidght / 2), (int)((objParser.Verts[poly.y - 1].z + 1) * depth / 2));
+
+                    Vec3f c = new Vec3f((objParser.Verts[poly.z - 1].x), (objParser.Verts[poly.z - 1].y), objParser.Verts[poly.z - 1].z);
+                    Vec3i cc = new Vec3i((int)((objParser.Verts[poly.z - 1].x + 1) * mapWidth / 2), (int)((objParser.Verts[poly.z - 1].y + 1) * mapHidght / 2), (int)((objParser.Verts[poly.z - 1].z + 1) * depth / 2));
+
+
+                    Vec3i textureVertice = objParser.UVVertice[i];
+                    
+                    Vec2i uv0 = new Vec2i((int)(objParser.UV[textureVertice.x - 1].x * model.DiffuseMap.Width ),   (int)((objParser.UV[textureVertice.x - 1].y)* model.DiffuseMap.Height));
+                    Vec2i uv1 = new Vec2i((int)(objParser.UV[textureVertice.y - 1].x * model.DiffuseMap.Width), (int)((objParser.UV[textureVertice.y - 1].y)* model.DiffuseMap.Height));
+                    Vec2i uv2 = new Vec2i((int)(objParser.UV[textureVertice.z - 1].x * model.DiffuseMap.Width), (int)((objParser.UV[textureVertice.z - 1].y)* model.DiffuseMap.Height));
+                    
 
 
                     Vec3f n = (c - a) ^ (b - a);
@@ -80,11 +89,8 @@ namespace Renderer
                     
                     float intensity = n * light_dir;
                     if (intensity > 0)
-                    {
-                            Render.triangle(aa, bb, cc, ref image, Color.FromArgb((int)(255 * intensity), (int)(255 * intensity), (int)(255 * intensity)),zbuffer);
-                       /* Random rnd = new Random();
-                        Color rand = Color.FromArgb((int)(rnd.Next(256) * intensity),(int) (rnd.Next(256)* intensity),(int) (rnd.Next(256)*intensity));
-                        Render.triangle(aa, bb, cc, ref image, rand,zbuffer);*/
+                    {                 
+                        Render.triangle(aa, bb, cc,uv0,uv1,uv2, ref image, intensity,zbuffer);
                     }
                    
 
@@ -117,7 +123,16 @@ namespace Renderer
             bmp.SetPixel( x, (bmp.Height - y-1), color);
         }
 
-     
+        ///<summary>
+        ///Перегрузка метода для взятия пикселя с перевернутой осью Y
+        /// 
+        /// </summary>
+        public static Color GetPixelV(this Bitmap bmp, int x, int y)
+        {
+            if (x < 0 || y < 0 || x > bmp.Width || y > bmp.Height) throw new Exception("Coordinates Ount Of Range");
+           return bmp.GetPixel(x, (bmp.Height - y - 1));
+        }
+
     }
 
 }
