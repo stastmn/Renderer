@@ -19,8 +19,11 @@ namespace Renderer
        static int mapHidght = image.Height;
        static int mapWidth = image.Width;
        static int depth = 256;
-       static Vec3f light_dir = new Vec3f(0, 0, -1);
-       static Vec3f camera = new Vec3f(0, 0, 3);
+       static Vec3f light_dir = new Vec3f(0, 0, -4).normalize();
+       static Vec3f eye = new Vec3f(0, 0, 4);
+       static Vec3f centre = new Vec3f(0, 0, 0); 
+
+       static Vec3f camera = new Vec3f(0, 0, 3);// странно, посмотреть
 
         /// <summary>
         /// Главная точка входа для приложения.
@@ -66,47 +69,36 @@ namespace Renderer
 
                 for (int i = 0; i < objParser.Faces.Count; i++)
                 {
-                    
+                    Matrix ModelView = Render.lookAt(eye, centre, new Vec3f(0, 1, 1));
                     Matrix Projection = new Matrix().identity(4);
                     Matrix ViewPort = viewport(mapWidth / 8, mapHidght / 8, mapWidth * 3 / 4, mapHidght * 3 / 4);
-                    Projection[3][2] = -1f / camera.z;
+                    Projection[3][2] = -1f / (eye - centre).norm();
 
-
+                    Matrix z = (ViewPort * Projection * ModelView);
                     Vec3i poly = objParser.Faces[i];
-                    
-                    // поменять вектора аа бб и тд на л1 л2 
-                    // и запихнуть это в массивы 
-
-                        Vec3f a = new Vec3f((objParser.Verts[poly.x - 1].x), (objParser.Verts[poly.x - 1].y), objParser.Verts[poly.x - 1].z);
-                        Vec3i aa = new Vec3i((int)((objParser.Verts[poly.x - 1].x + 1) * mapWidth / 2), (int)((objParser.Verts[poly.x - 1].y + 1) * mapHidght / 2), (int)((objParser.Verts[poly.x - 1].z + 1) * depth / 2));
-
-                        Vec3f b = new Vec3f((objParser.Verts[poly.y - 1].x), (objParser.Verts[poly.y - 1].y), objParser.Verts[poly.y - 1].z);
-                        Vec3i bb = new Vec3i((int)((objParser.Verts[poly.y - 1].x + 1) * mapWidth / 2), (int)((objParser.Verts[poly.y - 1].y + 1) * mapHidght / 2), (int)((objParser.Verts[poly.y - 1].z + 1) * depth / 2));
-
-                        Vec3f c = new Vec3f((objParser.Verts[poly.z - 1].x), (objParser.Verts[poly.z - 1].y), objParser.Verts[poly.z - 1].z);
-                        Vec3i cc = new Vec3i((int)((objParser.Verts[poly.z - 1].x + 1) * mapWidth / 2), (int)((objParser.Verts[poly.z - 1].y + 1) * mapHidght / 2), (int)((objParser.Verts[poly.z - 1].z + 1) * depth / 2));
-
-                    Vec3f l = m2v(ViewPort * Projection * v2m(poly));
-                    Vec3i l2 =(Vec3i) m2v(ViewPort * Projection * v2m(a));
-                    Vec3i l3 = (Vec3i)m2v(ViewPort * Projection * v2m(b));
-                    Vec3i l4 =(Vec3i) m2v(ViewPort * Projection * v2m(c));
-
                     Vec3i textureVertice = objParser.UVVertice[i];
-
-                        Vec2i uv0 = new Vec2i((int)(objParser.UV[textureVertice.x - 1].x * model.DiffuseMap.Width), (int)((objParser.UV[textureVertice.x - 1].y) * model.DiffuseMap.Height));
-                        Vec2i uv1 = new Vec2i((int)(objParser.UV[textureVertice.y - 1].x * model.DiffuseMap.Width), (int)((objParser.UV[textureVertice.y - 1].y) * model.DiffuseMap.Height));
-                        Vec2i uv2 = new Vec2i((int)(objParser.UV[textureVertice.z - 1].x * model.DiffuseMap.Width), (int)((objParser.UV[textureVertice.z - 1].y) * model.DiffuseMap.Height));
                     
 
+                    Vec3f[] worldCoords = new Vec3f[3];
+                    Vec3i[] screenCoords = new Vec3i[3];
+                    Vec2i[] uvCoords = new Vec2i[3];
+                    for (int k = 0; k < 3; k++)
+                    {
+                        worldCoords[k] = new Vec3f(objParser.Verts[poly[k] - 1].x, objParser.Verts[poly[k] - 1].y, objParser.Verts[poly[k] - 1].z);
+                        screenCoords[k] = (Vec3i)m2v(ViewPort * Projection * ModelView * v2m(worldCoords[k]));
+                        uvCoords[k] = new Vec2i((int)(objParser.UV[textureVertice[k] - 1].x * model.DiffuseMap.Width), (int)((objParser.UV[textureVertice[k] - 1].y) * model.DiffuseMap.Height));
+                    }
 
-                    Vec3f n = (c - a) ^ (b - a);
+                  
+
+
+                    Vec3f n = (worldCoords[2] - worldCoords[0]) ^ (worldCoords[1] - worldCoords[0]);
                     n = n.normalize();
                     
                     float intensity = n * light_dir;
                     if (intensity > 0)
                     {
-                        
-                        Render.triangle(l2, l3, l4,uv0,uv1,uv2, ref image, intensity,zbuffer);
+                        Render.triangle(screenCoords[0], screenCoords[1], screenCoords[2], uvCoords[0],uvCoords[1],uvCoords[2], ref image, intensity,zbuffer);
                     }
                    
 
@@ -115,7 +107,7 @@ namespace Renderer
             
 
           
-           // image.Save("perspectiveRender.jpg");
+            //image.Save("lul.jpg");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1(image));

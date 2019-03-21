@@ -43,7 +43,8 @@ namespace Renderer
         List<Vec3i> uvVertice = new List<Vec3i>();
         public List<Vec3i> UVVertice { get { return uvVertice; } }
 
-
+        List<Vec3f> normals = new List<Vec3f>();
+        public List<Vec3f> Normals { get { return normals; } }
 
         private void Parse()
         {
@@ -67,7 +68,13 @@ namespace Renderer
                     int vt1 = Int32.Parse(fx[2]);
                     int vt2 = Int32.Parse(fx[5]);
                     int vt3 = Int32.Parse(fx[8]);
-                    
+
+                    //взм н ну
+                    int vn1 = Int32.Parse(fx[3]);
+                    int vn2 = Int32.Parse(fx[6]);
+                    int vn3 = Int32.Parse(fx[9]);
+
+
                     faces.Add(new Vec3i(f1, f2, f3));
                     uvVertice.Add(new Vec3i(vt1, vt2, vt3));
                 }
@@ -78,7 +85,12 @@ namespace Renderer
                     
                     uv.Add( new Vec2f(vx[0], vx[1]));
                 }
-                
+                else if (line.ToLower().StartsWith("vn "))
+                {
+                    var vx = line.Split(' ').Skip(2).Select(vt => float.Parse(vt.Replace('.', ','))).ToArray(); ;
+
+                    normals.Add(new Vec3f(vx[0], vx[1],vx[2]));
+                }
             }
 
 

@@ -25,6 +25,36 @@ namespace Renderer
         public static Vec2i operator -(Vec2i A, Vec2i B) { return new Vec2i(A.x - B.x, A.y - B.y); }
         public static Vec2i operator *(Vec2i A, Vec2i B) { return new Vec2i(A.x * B.x, A.y * B.y); }
         public static Vec2i operator *(Vec2i A, float B) { return new Vec2i((int)((A.x * B)+0.5), (int)((A.y * B)+0.5)); }
+        public int this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0:
+                        return x;
+                    case 1:
+                        return y;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+            }
+        }
     }
 
     struct Vec2f
@@ -48,6 +78,36 @@ namespace Renderer
         public static Vec2f operator +(Vec2f A, Vec2f B) { return new Vec2f(A.x + B.x, A.y + B.y); }
         public static Vec2f operator -(Vec2f A, Vec2f B) { return new Vec2f(A.x - B.x, A.y - B.y); }
         public static Vec2f operator *(Vec2f A, Vec2f B) { return new Vec2f(A.x * B.x, A.y * B.y); }
+        public float this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0:
+                        return x;
+                    case 1:
+                        return y;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+            }
+        }
     }
 
     struct Vec3i
@@ -101,6 +161,41 @@ namespace Renderer
             //for(int i = 0; i < 3; i++) { a.raw[i] = (int)operand.raw[i]; }
             return a;
         }
+        public int this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0:
+                        return x;
+                    case 1:
+                        return y;
+                    case 2:
+                        return z;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    case 2:
+                        z = value;
+                        break;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+            }
+        }
     }
 
     struct Vec3f
@@ -137,7 +232,7 @@ namespace Renderer
         public static Vec3f operator ^(Vec3f A, Vec3f B) { return new Vec3f(A.y * B.z -A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x); }
         public static Vec3f operator *(Vec3f A, float B) { return new Vec3f(A.x * B, A.y * B, A.z * B); }
         public static float operator *(Vec3f A, Vec3f B) { return A.x * B.x + A.y * B.y + A.z * B.z; }
-        float norm() { return (float)Sqrt(x * x + y * y + z * z); }
+        public float norm() { return (float)Sqrt(x * x + y * y + z * z); }
        public Vec3f normalize() { this =( (this) * (1 / norm())); return this; }
         public static implicit operator Vec3f(Vec3i operand)
         {
@@ -152,7 +247,43 @@ namespace Renderer
             //for (int i = 0; i < 3; i++) { a.raw[i] = (float)operand.raw[i]; }
             return a;
         }
+        public float this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0:
+                        return x;
+                    case 1:
+                        return y;
+                    case 2:
+                        return z;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+                    
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0:
+                         x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    case 2:
+                        z = value;
+                        break;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+            }
+        }
     }
+
 
     
     class Matrix

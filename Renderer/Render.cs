@@ -118,6 +118,22 @@ namespace Renderer
 
         }
 
+        public static Matrix lookAt (Vec3f eye, Vec3f centre , Vec3f up)
+        {
+            Vec3f z = (eye - centre).normalize();
+            Vec3f x = (up ^ z).normalize();
+            Vec3f y = (z ^ x).normalize();
+            Matrix Minv = new Matrix().identity(4);
+            Matrix Tr = new Matrix().identity(4);
+            for(int i =0; i < 3; i++)
+            {
+                Minv[0][i] = x[i];
+                Minv[1][i] = y[i];
+                Minv[2][i] = z[i];
+                Tr[i][3] = -centre[i];
+            }
+            return  Minv * Tr;
+        }
 
      
         private static void Swap(ref int a, ref int b)
