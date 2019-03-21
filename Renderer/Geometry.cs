@@ -1,4 +1,5 @@
 ﻿using static System.Math;
+using System.Collections.Generic;
 namespace Renderer
 {
     
@@ -153,6 +154,137 @@ namespace Renderer
         }
     }
 
+    
+    class Matrix
+    {
+        const int DEFAULT_ALLOC = 4;
+        public int Rows { get; }
+        public int Cols { get; }
+        List<List<float>> m;
 
+        public Matrix(int r, int c)
+        {
 
+            Rows = r;
+            Cols = c;
+            m = new List<List<float>>(r);
+            for (int i = 0; i < r; i++)
+            {
+                m.Add( new List<float>(c) );
+                for (int j = 0; j < c; j++)
+                {
+                    m[i].Add(0);
+                }
+            }
+        }
+
+        public Matrix() : this(DEFAULT_ALLOC, DEFAULT_ALLOC) { }
+
+        public Matrix identity(int dimensions)
+        {
+            Matrix E = new Matrix(dimensions, dimensions);
+            for (int i = 0; i < dimensions; i++)
+            {
+                for (int j = 0; j < dimensions; j++)
+                {
+                    E[i][j] = (i == j ? 1f : 0f);
+                }
+            }
+            return E;
+        }
+
+        public List<float> this[int index]
+        {
+            get
+            {
+                return m[index];
+            }
+            set
+            {
+                m[index] = value;
+            }
+        }
+
+        public static Matrix operator *(Matrix a, Matrix b)
+        {
+            if (a.Cols != b.Rows) throw new System.Exception("Non - multiplilable martices");
+
+            Matrix result = new Matrix(a.Rows, b.Cols);
+            for(int i = 0; i < a.Rows; i++)
+            {
+                for(int j = 0; j < b.Cols; j++)
+                {
+                    result[i][j] = 0;
+                    for(int k = 0; k < a.Cols; k++)
+                    {
+                        result.m[i][j] += a.m[i][k] * b.m[k][j];
+                    }
+                }
+            }
+            return result;
+        }
+
+        public Matrix transpose()
+        {
+            Matrix result = new Matrix(Rows, Cols);
+            for(int i =0; i < Rows; i++)
+                for(int j = 0; j < Cols; j++)
+                    result[j][i] = this[i][j];
+
+            return result;
+        }
+
+        public Matrix invers()
+        {
+            if (Cols != Rows) throw new System.Exception("Non - inversible martix");
+            Matrix result = new Matrix(Rows, Cols * 2);
+            for (int i = 0; i < Rows; i++)
+                for (int j = 0; j < Cols; j++)
+                    result[i][j] = m[i][j];
+            for (int i = 0; i < Rows; i++)
+                result[i][i + Cols] = 1;
+            for(int i = 0; i < Rows - 1; i++)
+            {
+                for (int j = result.Cols - 1; j>=0; j--)
+                    result[i][j] /= result[i][i];
+
+                for (int k = i + 1; k < Rows; k++)
+                {
+                    float coef = result[k][i];
+                    for(int j = 0; j < result.Cols; j++)
+                    {
+                        result[k][j] -= result[i][j] * coef;
+                    }
+                }
+            }
+
+            // normalize the last row
+            for (int j = result.Cols - 1; j >= Rows - 1; j--)
+                result[Rows - 1][j] /= result[Rows - 1][Rows - 1];
+            // second pass
+            for (int i = Rows - 1; i > 0; i--)
+            {
+                for (int k = i - 1; k >= 0; k--)
+                {
+                    float coeff = result[k][i];
+                    for (int j = 0; j < result.Cols; j++)
+                    {
+                        result[k][j] -= result[i][j] * coeff;
+                    }
+                }
+            }
+
+            Matrix truncate = new Matrix(Rows, Cols);
+            for (int i = 0; i < Rows; i++)
+                for (int j = 0; j < Cols; j++)
+                    truncate[i][j] = result[i][j + Cols];
+            return truncate;
+        }
+
+        
+    }
+
+    
+
+            
 }
