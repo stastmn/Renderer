@@ -12,7 +12,14 @@ namespace Renderer
 {
     public partial class Form1 : Form
     {
-        Bitmap _bpm;
+        public void Render(ref Bitmap bmp)
+        {
+            
+            pictureBox1.Image = bmp;
+            
+        }
+
+        Bitmap _bmp;
         public Form1()
         {
             InitializeComponent();
@@ -21,12 +28,29 @@ namespace Renderer
         public Form1(Bitmap bmp)
         {
             InitializeComponent();
-             _bpm = bmp;
+             _bmp = bmp;
+
+            /*
+            var w = new System.Windows.Window();
+            UserControl1 u = new UserControl1(  this);
+            w.Content = u;
+            w.Show();
+            */
             
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            pictureBox1.Image = _bpm;
+            pictureBox1.Image = _bmp;
+        }
+        
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Enter(object sender, EventArgs e)
+        {
+            pictureBox1.Image = _bmp;
         }
     }
 }

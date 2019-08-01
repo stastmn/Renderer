@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="Renderer.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Renderer"
+             mc:Ignorable="d" Height="320" Width="320">
+    
+    <Grid>
+        <Button Content="↑" HorizontalAlignment="Left" Margin="123,20,0,0" VerticalAlignment="Top" Width="75" Height=" 75" FontSize="24" Click="Button_Click"/>
+        <Button Content="↓" HorizontalAlignment="Left" Margin="123,225,0,0" VerticalAlignment="Top" Width="75" Height="75" FontSize="24" Click="Button_Click_3"/>
+        <Button Content="←" HorizontalAlignment="Left" Margin="20,123,0,0" VerticalAlignment="Top" Width="75" Height="75" FontSize="24" Click="Button_Click_2"/>
+        <Button Content="→" HorizontalAlignment="Left" Margin="225,123,0,0" VerticalAlignment="Top" Width="75" Height="75" FontSize="24" Click="Button_Click_1"/>
+
+    </Grid>
+</UserControl>

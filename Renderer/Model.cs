@@ -40,8 +40,11 @@ namespace Renderer
          List<Vec2f> uv = new List<Vec2f>();
         public List<Vec2f> UV { get { return uv; } }
 
-        List<Vec3i> uvVertice = new List<Vec3i>();
-        public List<Vec3i> UVVertice { get { return uvVertice; } }
+         List<Vec3i> uvVertice = new List<Vec3i>();
+        public  List<Vec3i> UVVertice { get { return uvVertice; } }
+
+         List<Vec3i> vn = new List<Vec3i>();
+         public List<Vec3i> VN { get { return vn; } }
 
         List<Vec3f> normals = new List<Vec3f>();
         public List<Vec3f> Normals { get { return normals; } }
@@ -54,7 +57,8 @@ namespace Renderer
             {
                 if (line.ToLower().StartsWith("v "))
                 {
-                    var vx = line.Split(' ').Skip(1).Select(v => float.Parse(v.Replace('.', ','))).ToArray();
+                    var vx = line.Replace("  "," ").Split(' ').Skip(1).Select(v => float.Parse(v.Replace('.', ','))).ToArray();
+
                     verts.Add(new Vec3f(vx[0], vx[1], vx[2]));
                 }
                 else if (line.ToLower().StartsWith("f "))
@@ -77,17 +81,18 @@ namespace Renderer
 
                     faces.Add(new Vec3i(f1, f2, f3));
                     uvVertice.Add(new Vec3i(vt1, vt2, vt3));
+                    vn.Add(new Vec3i(vn1, vn2, vn3));
                 }
                 
                 else if(line.ToLower().StartsWith("vt "))
                 {
-                    var vx = line.Split(' ').Skip(2).Select(vt => float.Parse(vt.Replace('.', ','))).ToArray(); ;
+                    var vx = line.Replace("  "," ").Split(' ').Skip(1).Select(vt => float.Parse(vt.Replace('.', ','))).ToArray(); ;
                     
                     uv.Add( new Vec2f(vx[0], vx[1]));
                 }
                 else if (line.ToLower().StartsWith("vn "))
                 {
-                    var vx = line.Split(' ').Skip(2).Select(vt => float.Parse(vt.Replace('.', ','))).ToArray(); ;
+                    var vx = line.Replace("  "," ").Split(' ').Skip(1).Select(vt => float.Parse(vt.Replace('.', ','))).ToArray(); ;
 
                     normals.Add(new Vec3f(vx[0], vx[1],vx[2]));
                 }
@@ -136,6 +141,23 @@ namespace Renderer
 
 
         }
+
+        public Vec3f vert (int iface, int nthvert)
+        {
+            return verts[faces[iface][nthvert]-1];
+        }
+        public Vec3f normal(int iface, int nthvert)
+        {
+            int idx = Faces[iface][nthvert] ;
+            return Normals[idx-1].normalize();
+        }
+
+        public System.Drawing.Color diffuse(Vec2f uvf)
+        {
+            Vec2i uv = new Vec2i((int)((uvf[0] * diffuseMap.Width)+0.5), (int)((uvf[1] * diffuseMap.Height)+0.5));
+            return diffuseMap.GetPixelV(uv.x, uv.y);
+        }
+
     }
 
  

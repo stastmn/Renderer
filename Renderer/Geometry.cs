@@ -233,7 +233,11 @@ namespace Renderer
         public static Vec3f operator *(Vec3f A, float B) { return new Vec3f(A.x * B, A.y * B, A.z * B); }
         public static float operator *(Vec3f A, Vec3f B) { return A.x * B.x + A.y * B.y + A.z * B.z; }
         public float norm() { return (float)Sqrt(x * x + y * y + z * z); }
-       public Vec3f normalize() { this =( (this) * (1 / norm())); return this; }
+       public Vec3f normalize() {
+            float r = 1 / norm();
+            this = ( (this) * (1 / norm()));
+            return this;
+        }
         public static implicit operator Vec3f(Vec3i operand)
         {
             Vec3f a = new Vec3f();
@@ -284,8 +288,116 @@ namespace Renderer
         }
     }
 
+    struct Vec4f
+    {
 
-    
+        public float ivert, iuv, inorm;
+        public float x, y, z,k;
+        public float[] raw;
+
+        public Vec4f(Vec4f _vec)
+        {
+            iuv = _vec.iuv;
+            ivert = _vec.ivert;
+            inorm = _vec.inorm;
+            x = _vec.x;
+            y = _vec.y;
+            z = _vec.z;
+            k = _vec.k;
+            raw = _vec.raw;
+        }
+        public Vec4f(float _x, float _y, float _z,float _k)
+        {
+            iuv = 0;
+            ivert = 0;
+            inorm = 0;
+            x = _x;
+            y = _y;
+            z = _z;
+            k = _k;
+            raw = new float[3];
+        }
+
+        public static Vec4f operator +(Vec4f A, Vec4f B) { return new Vec4f(A.x + B.x, A.y + B.y, A.z + B.z,A.k+B.k); }
+        public static Vec4f operator -(Vec4f A, Vec4f B) { return new Vec4f(A.x - B.x, A.y - B.y, A.z - B.z,A.k-B.k); }
+        //public static Vec3f operator *(Vec3f A, Vec3f B) { return new Vec3f(A.x * B.y, A.x * B.y, A.z * B.z); }
+        //public static Vec4f operator ^(Vec4f A, Vec4f B) { return new Vec4f(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x); }
+        public static Vec4f operator *(Vec4f A, float B) { return new Vec4f(A.x * B, A.y * B, A.z * B,A.k*B); }
+        public static Vec4f operator /(Vec4f A, float B) { return new Vec4f(A.x / B, A.y / B, A.z / B, A.k / B); }
+        public static float operator *(Vec4f A, Vec4f B) { return A.x * B.x + A.y * B.y + A.z * B.z; }
+        public float norm() { return (float)Sqrt(x * x + y * y + z * z); }
+        public Vec4f normalize() { this = ((this) * (1 / norm())); return this; }
+        public static implicit operator Vec4f(Vec3i operand)
+        {
+            Vec4f a = new Vec4f();
+            a.x = (float)operand.x;
+            a.y = (float)operand.y;
+            a.z = (float)operand.z;
+            a.iuv = (float)operand.iuv;
+            a.ivert = (float)operand.ivert;
+            a.inorm = (float)operand.inorm;
+            a.raw = new float[3];
+            //for (int i = 0; i < 3; i++) { a.raw[i] = (float)operand.raw[i]; }
+            return a;
+        }
+        public static implicit operator Vec4f(Vec3f operand)
+        {
+            Vec4f a = new Vec4f();
+            a.x = operand.x;
+            a.y = operand.y;
+            a.z = operand.z;
+            a.k = 1;
+            a.iuv = operand.iuv;
+            a.ivert = operand.ivert;
+            a.inorm = operand.inorm;
+            a.raw = new float[3];
+            //for (int i = 0; i < 3; i++) { a.raw[i] = (float)operand.raw[i]; }
+            return a;
+        }
+        public float this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0:
+                        return x;
+                    case 1:
+                        return y;
+                    case 2:
+                        return z;
+                    case 3:
+                        return k;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    case 2:
+                        z = value;
+                        break;
+                    case 3:
+                        k = value;
+                        break;
+                    default:
+                        throw new System.Exception("Index is out of range ");
+                }
+            }
+        }
+    }
+
+
+
     class Matrix
     {
         const int DEFAULT_ALLOC = 4;
@@ -354,6 +466,17 @@ namespace Renderer
             }
             return result;
         }
+        public static Matrix operator /(Matrix lhs, float rhs)
+        {
+            for(int i =4;i> -1; i--)
+            {
+                for (int j = 4; j > -1; j--)
+                {
+                    lhs[i][j] = lhs[i][j] / rhs;
+                }
+            }
+            return lhs;
+        }
 
         public Matrix transpose()
         {
@@ -412,10 +535,110 @@ namespace Renderer
             return truncate;
         }
 
+        public void set_col(int idx, Vec2f v)
+        {
+            for(int i = Rows-1; i>-1; i--)
+            {
+                this[i][idx] = v[i];
+            }
+        }
         
-    }
+
+        public static Vec2f operator *(Matrix A, Vec3f B)
+        {
+            Vec2f ret = new Vec2f();
+            try
+            {
+                for (int i = 0; i < A.Rows; i++)
+                {
+                    for (int j = 0; j < A.Cols; j++)
+                    {
+                        ret[i] += A[i][j] * B[j];
+                    }
+                }
+                return ret;
+            }catch(System.Exception e) { throw new System.Exception("Wrong dimensions."); }
+        }
+        
+        public static Vec4f operator *(Matrix A, Vec4f B)
+        {
+            Vec4f ret = new Vec4f();
+            try
+            {
+                for (int i = 0; i < A.Rows; i++)
+                {
+                    for (int j = 0; j < A.Cols; j++)
+                    {
+                        ret[i] += A[i][j] * B[j];
+                    }
+                }
+                return ret;
+            }
+            catch (System.Exception e) { throw new System.Exception("Wrong dimensions."); }
+        }
+        public static Vec4f embed(ref Vec3f v,int diff)
+        {
+            
+            Vec4f ret = new Vec4f();
+            for(int i = 0; i < 3; i++)
+            {
+                ret[i] = i < diff ? v[i] : 1f;
+            }
+            return ret;
+        }
+        struct dt
+        {
+            public static float det(Matrix src)
+            {
+                float ret = 0;
+                for (int i = 3; i > -1; i--)
+                    ret += src[0][i] * src.cofactor(0, i);
+                return ret;
+            }
+        }
+        float det()
+        {
+            return dt.det( this);
+        }
+        float cofactor(int row, int coll)
+        {
+            return get_minor(row, coll).det() * ((row + coll) % 2 ==0 ? -1 : 1);
+        }
+        Matrix get_minor(int row,int col)
+        {
+            Matrix ret = new Matrix();
+            for(int i = 3; i > -1; i--)
+            {
+                for(int j = 3;j> -1; j--)
+                {
+                    ret[i][j] = m[i <= row ? i : i + 1][j <= col ? j : j + 1];
+                }
+            }
+            return ret;
+        }
+        Matrix adjugate()
+        {
+            Matrix ret = new Matrix();
+            for (int i = 3; 3 > -1; i--)
+            {
+                for (int j = 3; j > -1; j--)
+                {
+                    ret[i][j] = cofactor(i, j);
+                }
+            }
+            return ret;
+        }
+        public Matrix invert_transpose()
+        {
+            Matrix ret = adjugate();
+            float tmp = new Vec4f(ret[0][0], ret[0][1], ret[0][2], ret[0][3]) * new Vec4f(m[0][0], m[0][1], m[0][2], m[0][3]);
+            return ret / tmp;
+        }
+}
+
+}
 
     
 
             
-}
+
