@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.Threading;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 
 namespace Renderer
@@ -19,14 +20,13 @@ namespace Renderer
     {
         static public Model model;
         static Bitmap image = new Bitmap(800, 800);
-        
 
         static int mapHeight = image.Height;
         static int mapWidth = image.Width;
         static int depth = 255;
 
         static Vec3f light_dir = new Vec3f(1, 1, 1);
-        static Vec3f eye = new Vec3f(1, 1, 1);
+        static Vec3f eye = new Vec3f(0f, 0, 2f);
         static Vec3f centre = new Vec3f(0, 0, 0);
         static Vec3f up = new Vec3f(0,1,0);
 
@@ -77,7 +77,7 @@ namespace Renderer
             public Vec4f vertex(int iface, int nthvert)
             {
                 //varying_uv = new Matrix(2, 3);
-                varying_uv.set_col(nthvert, model.UV[model.UVVertice[iface][nthvert] - 1]);
+                varying_uv.set_col(nthvert, model.UV[model.UVVertice[iface][nthvert]-1 ]);
                 Vec4f gl_Vertex = model.vert(iface, nthvert);//read vertex
                 gl_Vertex = m2v4(Render.ViewPort * Render.Projection * Render.ModelView * v2m(gl_Vertex));
                // varying_Intensity[nthvert] = Math.Max(0f, model.normal(iface, nthvert) * light_dir);
@@ -93,7 +93,7 @@ namespace Renderer
                 color = Render.colorMultiply(model.diffuse(uv), intensity);
 
                 //color = Render.colorMultiply(Color.FromArgb(255, 255, 255), intensity);
-                // if (intensity < 0.001) return true;
+                 //if (intensity < 0.7) return true;
                 /*if (poly == 100) { poly = 0;return true; }
                 poly++;*/
                 return false;
@@ -111,13 +111,17 @@ namespace Renderer
 
         static int[] zbuffer = new int[mapHeight * mapWidth];
 
-
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
         [STAThread]
         static void Main()
         {
+            
+            
             Bitmap zBufferI = new Bitmap(800, 800);
             /*for(int i = 0; i < 800; i++)
             {
@@ -148,7 +152,7 @@ namespace Renderer
        
                 Shader shader = new Shader(1);
             shader.uniform_M = Render.Projection * Render.ModelView;
-            Matrix InversTranspose = new Matrix();InversTranspose[0] = new List<float>{ 0.949f,0f,-0.316f,0f}; InversTranspose[1] = new List<float> { -0.0953f, 0.953f, -0.286f, 0f }; InversTranspose[2] = new List<float> { 0.302f, 302f, 0.905f, 0.302f }; InversTranspose[3] = new List<float> { 0f, 0f, 0f, 1f };
+            Matrix InversTranspose = (Render.Projection * Render.ModelView).invert_transpose(); /* new Matrix();InversTranspose[0] = new List<float>{ 0.949f,0f,-0.316f,0f}; InversTranspose[1] = new List<float> { -0.0953f, 0.953f, -0.286f, 0f }; InversTranspose[2] = new List<float> { 0.302f, 302f, 0.905f, 0.302f }; InversTranspose[3] = new List<float> { 0f, 0f, 0f, 1f };*/
             shader.uniform_MIT = InversTranspose;
                 int count = model.Faces.Count - 1;
                 for (int i = 0; i <count ; i++)
@@ -350,7 +354,7 @@ namespace Renderer
         /// </summary>
         public static void SetPixelV(this Bitmap bmp, int x, int y, Color color)
         {
-            if (x < 0 ||  y < 0 || x > bmp.Width  || y > bmp.Height ) throw new Exception("Coordinates Ount Of Range");
+            if (x < 0 || y < 0 || x >= bmp.Width || y >= bmp.Height) return; //throw new Exception("Coordinates Ount Of Range");
             bmp.SetPixel( x, (bmp.Height - y-1), color);
         }
 
@@ -360,7 +364,7 @@ namespace Renderer
         /// </summary>
         public static Color GetPixelV(this Bitmap bmp, int x, int y)
         {
-            if (x < 0 || y < 0 || x > bmp.Width || y > bmp.Height) throw new Exception("Coordinates Ount Of Range");
+            if (x < 0 || y < 0 || x >= bmp.Width || y >= bmp.Height) return Color.Cyan;//throw new Exception("Coordinates Ount Of Range");
            return bmp.GetPixel(x, (bmp.Height - y - 1));
         }
 

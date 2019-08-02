@@ -31,5 +31,4 @@ C:\Users\larionovsy\Desktop\Renderer\Renderer\obj\Debug\Renderer.Controler.resou
 C:\Users\larionovsy\Desktop\Renderer\Renderer\obj\Debug\Renderer.Form1.resources
 C:\Users\larionovsy\Desktop\Renderer\Renderer\obj\Debug\Renderer.Properties.Resources.resources
 C:\Users\larionovsy\Desktop\Renderer\Renderer\obj\Debug\Renderer.csproj.GenerateResource.cache
-C:\Users\larionovsy\Desktop\Renderer\Renderer\obj\Debug\Renderer.csproj.CoreCompileInputs.cache
 C:\Users\larionovsy\Desktop\Renderer\Renderer\obj\Debug\Renderer.csproj.CopyComplete

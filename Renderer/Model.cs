@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Drawing;
 
 
 namespace Renderer
@@ -148,8 +149,19 @@ namespace Renderer
         }
         public Vec3f normal(int iface, int nthvert)
         {
+
+            Color c = normalMap.GetPixelV(iface, nthvert);
+            Vec3f res = new Vec3f();
+            float color= 0;
+            for (int i = 0; i < 3; i++)
+            {
+                if (i == 0) color = c.R;
+                else if (i == 1) color = c.G;
+                else if (i == 2) color = c.B;
+                res[2 - i] = (float)color / 255f * 2f - 1f;
+            }
             int idx = Faces[iface][nthvert] ;
-            return Normals[idx-1].normalize();
+            return res;
         }
 
         public System.Drawing.Color diffuse(Vec2f uvf)

@@ -1,5 +1,6 @@
 ﻿using static System.Math;
 using System.Collections.Generic;
+using System;
 namespace Renderer
 {
     
@@ -468,9 +469,9 @@ namespace Renderer
         }
         public static Matrix operator /(Matrix lhs, float rhs)
         {
-            for(int i =4;i> -1; i--)
+            for(int i =3;i> -1; i--)
             {
-                for (int j = 4; j > -1; j--)
+                for (int j = 3; j > -1; j--)
                 {
                     lhs[i][j] = lhs[i][j] / rhs;
                 }
@@ -590,39 +591,64 @@ namespace Renderer
         {
             public static float det(Matrix src)
             {
+                if(src.Cols==1 && src.Rows == 1)
+                {
+                    return src[0][0];
+                }
+                Console.WriteLine("det. Dim is " + src.Cols);
                 float ret = 0;
-                for (int i = 3; i > -1; i--)
+                for (int i = src.Rows - 1; i > -1; i--)
+                {
+                    Console.WriteLine("det. i is " + i);
                     ret += src[0][i] * src.cofactor(0, i);
+
+                }
                 return ret;
             }
         }
         float det()
         {
-            return dt.det( this);
+            float f = dt.det( this);
+            Console.WriteLine("Det return is " + f);
+            return f;
         }
         float cofactor(int row, int coll)
         {
-            return get_minor(row, coll).det() * ((row + coll) % 2 ==0 ? -1 : 1);
+            
+            Console.WriteLine("Cofactor");
+            int tr = ((row + coll) % 2 == 0 ? 1 : -1);
+            Console.WriteLine("COEF IS " + tr);
+            float f = get_minor(row, coll).det() * ((row + coll) % 2 ==0 ? 1 : -1);
+            Console.WriteLine("Cofactor returning is " + f);
+            return f;
         }
         Matrix get_minor(int row,int col)
         {
-            Matrix ret = new Matrix();
-            for(int i = 3; i > -1; i--)
+
+            Matrix ret = new Matrix(Rows-1,Cols-1);
+            Console.WriteLine("get_minor. DimRows is " + ret.Rows + ". DimCols is " + ret.Cols);
+            for(int i = Rows-2; i > -1; i--)
             {
-                for(int j = 3;j> -1; j--)
+                for(int j = Cols-2;j> -1; j--)
                 {
-                    ret[i][j] = m[i <= row ? i : i + 1][j <= col ? j : j + 1];
+                    Console.WriteLine("get_minor cicle. i is " + i + " j is " + j);
+                    int a = i < row ? i : i + 1;
+                    int b = i < col ? j : j + 1;
+                    ret[i][j] = m[i < row ? i : i + 1][j < col ? j : j + 1];
                 }
             }
+            
             return ret;
         }
         Matrix adjugate()
         {
-            Matrix ret = new Matrix();
-            for (int i = 3; 3 > -1; i--)
+            Console.WriteLine("adjugate. DimRows is " + Rows + ". DimCols is" + Cols);
+            Matrix ret = new Matrix(Rows,Cols);
+            for (int i = Rows-1; i > -1; i--)
             {
-                for (int j = 3; j > -1; j--)
+                for (int j = Cols-1; j > -1; j--)
                 {
+                    Console.WriteLine("Adjugate. i is " + i + ". j is" + j);
                     ret[i][j] = cofactor(i, j);
                 }
             }
@@ -630,7 +656,9 @@ namespace Renderer
         }
         public Matrix invert_transpose()
         {
-            Matrix ret = adjugate();
+            Console.WriteLine("Invert_transpose. DimRows is " + Rows + ". DimCols is" + Cols);
+            Matrix ret = new Matrix(Rows, Cols);
+               ret =  adjugate();
             float tmp = new Vec4f(ret[0][0], ret[0][1], ret[0][2], ret[0][3]) * new Vec4f(m[0][0], m[0][1], m[0][2], m[0][3]);
             return ret / tmp;
         }
